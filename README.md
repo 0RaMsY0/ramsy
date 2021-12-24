@@ -1,2 +1,0 @@
-# ramsy
-Exploitation Tool
