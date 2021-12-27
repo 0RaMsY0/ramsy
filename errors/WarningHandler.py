@@ -28,3 +28,21 @@ def NoScreenStreamingPortSpec():
 def NoReverShellPort():
     print(f" {Sminess}{CR.red()} The {CR.yellow()}-rsp {CR.blue()}[--ReverseShellPort] {CR.red()}parameters is required and we didn't find any value for it in the {CR.yellow()}config.json{CR.white()}")
     sys.exit()
+
+def IneededArguments(plus_arg, main_arg):
+    ARG = ["Ssp", "Rsp", "Csp", "Asp"]
+    for x, y in zip(plus_arg, ARG):
+        if x.startswith("A"):
+            plus_arg.replace(x ,ARG[3])
+        elif x.startswith("S"):
+             plus_arg[x] = ARG[0]
+        elif x.startswith("R"):
+             plus_arg[x] = ARG[1]
+        elif x.startswith("C"):
+             plus_arg[x] = ARG[2]
+        print(plus_arg)
+        """
+        if x == main_arg:
+            pass
+        else:
+            print(f"{Sminess}{CR.red()} this arguments {CR.yellow()}\r{x} {CR.red()}aren't required on thsi type of payloads{CR.white()}")"""

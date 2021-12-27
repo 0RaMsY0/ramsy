@@ -90,9 +90,26 @@ if __SET__:
         P_LPORT_SOCKET = CONFIG_LOAD["PayloadConfig"]["lport"]["SocketPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["SocketPort"] else __SocketLport__ if __SocketLport__ else NoLportSpec()
         if __SET__ == PAYLOADS_TYPES[0]: #CameraStreaming
             __CameraStreamingPort__ = CONFIG_LOAD["PayloadConfig"]["lport"]["CameraStreamingPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["CameraStreamingPort"] else __CameraStreamingPort__ if __CameraStreamingPort__ else NoCameraStreamingPortSpec()
+            PAYLOADS_TYPES.remove("CameraStreaming")
+            IneededArguments(
+                plus_arg= PAYLOADS_TYPES,
+                main_arg=PAYLOADS_TYPES[0]
+            )
         elif __SET__ == PAYLOADS_TYPES[1]:  #AudioStreaming
             __AudioStreamingPort__ = CONFIG_LOAD["PayloadConfig"]["lport"]["AudioStreamingPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["AudioStreamingPort"] else __AudioStreamingPort__ if __AudioStreamingPort__ else NoAudioStreamingPortSpec()
+            IneededArguments(
+                plus_arg= PAYLOADS_TYPES.remove("AudioStreaming"),
+                main_arg=PAYLOADS_TYPES[1]
+            )
         elif __SET__ == PAYLOADS_TYPES[2]: #ScreenStreaming
             __ScreenStreamingPort__ = CONFIG_LOAD["PayloadCondig"]["lport"]["ScreenStreamingPort"] if CONFIG_LOAD["PayloadCondig"]["lport"]["ScreenStreamingPort"] else __ScreenStreamingPort__ if __ScreenStreamingPort__ else NoScreenStreamingPortSpec()
+            IneededArguments(
+                plus_arg= PAYLOADS_TYPES.remove("ScreenStreaming"),
+                main_arg=PAYLOADS_TYPES[2]
+            )
         elif __SET__ == PAYLOADS_TYPES[3]: #ReverseShell
             __ReverseShellPort__ = CONFIG_LOAD["PayloadConfig"]["lport"]["ReverseShellPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["ReverseShellPort"] else __ReverseShellPort__ if __ReverseShellPort__ else NoReverShellPort()
+            IneededArguments(
+                plus_arg= PAYLOADS_TYPES.remove("ReverseShell"),
+                main_arg=PAYLOADS_TYPES[3]
+            )
