@@ -1,8 +1,6 @@
 """
     this code created by 0RaMsY0
 """
-#checking var
-LHOST_OPT = False
 #main host for everything
 LHOST = ""
 #payload configuration veriables
@@ -23,6 +21,7 @@ from payloads.name import PAYLOADS_TYPES
 from errors.WarningHandler import * #error handler you will find the script in warnings\WarningHandler.py directory
 import json
 import socket
+
 CR = colors #colors class from assets/colors.py
 
 PARSER = argparse.ArgumentParser()
@@ -73,14 +72,17 @@ if __SET__:
     if __SET__ == PAYLOADS_TYPES[0]:
         with open("config.json", "r") as JSON_CONF:
             CONFIG_LOAD = json.load(JSON_CONF)
-            if __SocketLhost__ is None:
-                if CONFIG_LOAD["PayloadConfig"]["lhost"] is None:
-                    NoLhostSpec()
-                    sys.exit()
-                else:
-                    if CONFIG_LOAD["PayloadConfig"]["lhost"] is not None:
-                        if CONFIG_LOAD["PayloadConfig"]["lhost"] == "auto":
-                            LHOST = socket.gethostbyname(socket.gethostname())
-                        else:
-                            LHOST = CONFIG_LOAD["PayloadConfig"]["lhost"]
-print(LHOST)
+            if CONFIG_LOAD["PayloadConfig"]["lhost"]:
+                LHOST = socket.gethostbyname(socket.gethostname()) if CONFIG_LOAD["PayloadConfig"]["lhost"] == "auto" else CONFIG_LOAD["PayloadConfig"]["lhost"]
+            else:
+                pass
+            if __SocketLhost__:
+                LHOST = __SocketLhost__
+            else:
+                pass
+            if LHOST:
+                pass
+            else:
+                NoLhostSpec()
+            P_LPORT_SOCKET = CONFIG_LOAD["PayloadConfig"]["lport"]["SocketPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["SocketPort"] else __SocketLport__ if __SocketLport__ else NoLportSpec()
+            __CameraStreamingPort__ = CONFIG_LOAD["PayloadConfig"]["lport"]["CameraStreamingPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["CameraStreamingPort"] else __CameraStreamingPort__ if __CameraStreamingPort__ else NoCameraStreamingPortSpec()

