@@ -2,21 +2,25 @@ import json
 import socket
 import time, sys, os
 import platform
-import colorama
 import requests
 import json
 import threading
 
-HOST = socket.gethostbyname(socket.gethostname())
-PORT = 1827
-CameraStreamingPort = 8989
+HOST = ""
+PORT = 0000
+CameraStreamingPort = 0
 try :
     from vidstream import CameraClient
 except:
     os.system("pip install vidstream >> intall.txt && rm install.txt")
     from vidstream import CameraClient
-    
-#colors :)
+try:
+    import colorama
+except:
+    os.system("pip3 install colorama >> install.txt && rm install.txt")
+    import colorama
+
+#colors
 class colors (object):
     def red():
         return colorama.Fore.RED
