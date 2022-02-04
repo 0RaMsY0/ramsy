@@ -14,7 +14,6 @@ SET_VALUE = ""
 
 import argparse
 import time, os, sys
-from typing import ParamSpec, Text
 from server.name import SERVER_TYPES
 from payloads.name import PAYLOADS_TYPES
 from assets.colors import colors
