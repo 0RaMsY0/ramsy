@@ -7,10 +7,10 @@ import json
 import threading
 
 HOST = socket.gethostbyname(socket.gethostname())
-PORT = 1827
+PORT = 9887
 CameraStreamingPort = 8989
 
-try :
+try:
     from vidstream import CameraClient
 except:
     os.system("pip install vidstream >> intall.txt && rm install.txt")

