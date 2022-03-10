@@ -55,7 +55,7 @@ CONFIG_FILE = "server/setting/CS-config.ini"
 CONFIG = ConfigParser()
 CONFIG.read(CONFIG_FILE)
 #setting config to var
-HOST =  "192.168.1.107"#CONFIG["CameraStreaming"]["lhost"]
+HOST =  "192.168.1.106"#CONFIG["CameraStreaming"]["lhost"]
 PORT = 9887#int(CONFIG["CameraStreaming"]["socketport"])
 CAMERA_STREAMING_PORT = 8989#CONFIG["CameraStreaming"]["camerastreamingport"]
 
