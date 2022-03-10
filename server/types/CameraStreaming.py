@@ -165,7 +165,7 @@ def connect_with_host(target_add):
                 target_add.send(json.dumps(INFO_MSG).encode())
                 recv_target_info(target=target_add)
             elif COMMAND_FOR_TARGET_SESSION == "clear":
-                clear_screen
+                clear_screen()
             elif COMMAND_FOR_TARGET_SESSION == "back to main":
                 if SERVER_UP:
                     print(f"\r{Swarning} {CR.green()}Stoping the stream recv...", end="")
@@ -224,7 +224,7 @@ def run():
                     os.system("rm server/setting/CS-config.ini")
                     x.shutdown(socket.SHUT_RDWR);server.close(); time.sleep(1); sys.exit() #just to make sure all the targets that are connected close the connection and shuting the payloads down
             elif COMMAND_INPUT == "clear":
-                clear_screen
+                clear_screen()
         except KeyboardInterrupt:
             print(f"{Splus} {CR.green()} User interrupt {CR.yellow()}[CTRL+C]{CR.green()}exiting...")
             for x in TARGETS:
